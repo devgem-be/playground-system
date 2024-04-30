@@ -1,0 +1,63 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Address {
+  addressLine1 String    @map("addressLine_1")
+  addressLine2 String?   @map("addressLine_2")
+  city         String
+  companies    Company[]
+  country      String
+  createdAt    DateTime  @default(now())
+  id           String    @id @default(cuid())
+  updatedAt    DateTime  @updatedAt
+  zipCode      String
+}
+
+model Company {
+  address   Address  @relation(fields: [addressId], references: [id])
+  addressId String
+  ceos      Ceo[]
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  updatedAt DateTime @updatedAt
+}
+
+model Person {
+  ceos      Ceo[]
+  createdAt DateTime @default(now())
+  firstName String
+  id        String   @id @default(cuid())
+  lastName  String
+  updatedAt DateTime @updatedAt
+}
+
+model Ceo {
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId String
+  createdAt DateTime  @default(now())
+  fromDate  DateTime
+  id        String    @id @default(cuid())
+  person    Person    @relation(fields: [personId], references: [id])
+  personId  String
+  untilDate DateTime?
+  updatedAt DateTime  @updatedAt
+}
